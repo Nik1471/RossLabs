@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Streamlabs Manual Alerts
-// @namespace    RossmannGroup
+// @name         RossLabs
+// @namespace    Nik1471
 // @version      0.5
-// @description  Adds a smart button to trigger Streamlabs alerts manually
-// @author       Nikolai
+// @description  Streamlabs Alerts userscript for Louis Rossmann
+// @author       Nik1471
 // @icon         https://streamlabs.com/images/favicons/favicon.svg
 // @match        https://streamlabs.com/alert-box/v*
 // @match        https://streamlabs.com/widgets/frame/alertbox/*
