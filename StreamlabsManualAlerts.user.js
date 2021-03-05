@@ -14,7 +14,7 @@
 // @grant        GM_setValue
 // ==/UserScript==
 
-/* global jQuery, $ */
+/* global jQuery, $, _ */
 
 var alertUrl = 'https://cdn.twitchalerts.com/twitch-bits/sounds/bits.ogg'
 
@@ -30,8 +30,12 @@ $(function() {
         var alertAudio = new Audio(alertUrl);
 
         var cssCode = [
+            '#wrap { display: none !important; }',
+            '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; }',
             '#widget { right: 150px !important; }',
             '#wrap-btn { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 150px; display: flex; align-items: center; justify-content: center; }',
+            '.hidden { opacity: 1 !important; }',
+            '.animated { animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
             '.alert-btn { width: 100px; height: 100px; }'
         ].join('\n');
         GM_addStyle(cssCode);
@@ -42,9 +46,10 @@ $(function() {
             GM_setValue('database', database);
         }
 
-        var buttonHtml = '<div id="wrap-btn"><button class="alert-btn">Next</button></div>';
+        var buttonHtml = '<div id="wrap-btn"><button id="alert-btn" class="alert-btn">Next</button></div>';
         var $widget = $('#widget');
         $widget.after(buttonHtml);
+        $('#wrap').after('<div id="wrap-copy">');
 
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
@@ -75,6 +80,17 @@ $(function() {
 
         observer.observe($widget[0], {
             attributes: true
+        });
+
+        $('#alert-btn').click(function() {
+            var $wrapCopy = $('#wrap-copy');
+            $wrapCopy.empty();
+            var next = _.findIndex(database, ['s', 0]);
+            if (next !== -1) {
+                $wrapCopy.append(database[next].m);
+                database[next].s = 1;
+                GM_setValue('database', database);
+            }
         });
     }
 });
