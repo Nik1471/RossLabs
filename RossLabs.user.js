@@ -9,12 +9,13 @@
 // @match        https://streamlabs.com/widgets/frame/alertbox/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.2/timeago.min.js
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
 // ==/UserScript==
 
-/* global jQuery, $, _ */
+/* global jQuery, $, _, timeago */
 
 var alertUrl = 'https://cdn.twitchalerts.com/twitch-bits/sounds/bits.ogg'
 
@@ -43,8 +44,8 @@ $(function() {
             '.wrap-button > .my-button { position: absolute; top: 1.6vw; left: -5.5vw; }',
 
             '.alert-counter { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #767676; box-sizing: border-box; margin-bottom: 2vw; font-size: 2.4vw; color: #9e9e9e }',
-            '#message-curr, #message-all { color: white; }',
-            '#message-all { font-weight: 600; }',
+            '#message-curr, #message-all { color: white; opacity: 0.8; }',
+            '#message-all { font-weight: 600; opacity: 1; }',
 
             '.my-button { font-size: 4.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; }',
             '.my-button:hover { opacity: 0.9; }',
@@ -52,7 +53,9 @@ $(function() {
             '.my-button:focus { outline: 0; }',
 
             '.alert-nav { width: 100%; margin-bottom: 1vw; }',
-            '.alert-nav > .my-button { width: 50%; }'
+            '.alert-nav > .my-button { width: 50%; }',
+
+            '.time { margin-left: 0.5em; font-size: 80%; opacity: 0.8; }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -116,9 +119,16 @@ $(function() {
             attributes: true
         });
 
-        var showMessage = function(ind) {
+        var showMessage = function(ind, fast) {
+            var speed = 'fast';
+            if (fast) {
+                speed = 0;
+            }
+            timeago.cancel();
             $wrapCopy.empty();
-            $wrapCopy.append(database[ind].m).hide(0).fadeIn('fast');
+            $wrapCopy.append(database[ind].m).hide(0).fadeIn(speed);
+            $wrapCopy.find('#alert-message').append('<time class="time" datetime="' + database[ind].t + '">');
+            timeago.render(document.querySelectorAll('.time'));
             lastIndex = ind + 1;
             updateCurr();
             GM_setValue('last_index', lastIndex);
@@ -141,9 +151,9 @@ $(function() {
         $('#prev-button').click(function() {
             if (lastIndex) {
                 if ($wrapCopy.children().length === 0) {
-                    showMessage(lastIndex - 1);
+                    showMessage(lastIndex - 1, true);
                 } else if (lastIndex > 1) {
-                    showMessage(lastIndex - 2);
+                    showMessage(lastIndex - 2, true);
                 }
             }
         });
@@ -151,9 +161,9 @@ $(function() {
         $('#next-button').click(function() {
             if (lastIndex) {
                 if ($wrapCopy.children().length === 0) {
-                    showMessage(lastIndex - 1);
+                    showMessage(lastIndex - 1, true);
                 } else if (database[lastIndex] && database[lastIndex].s === 1) {
-                    showMessage(lastIndex);
+                    showMessage(lastIndex, true);
                 }
             }
         });
