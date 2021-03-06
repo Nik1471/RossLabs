@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         RossLabs
+// @name         RossmannLabs
 // @namespace    Nik1471
 // @version      0.5
 // @description  Streamlabs Alerts userscript for Louis Rossmann
