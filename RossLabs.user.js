@@ -11,6 +11,7 @@
 // @require      https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.2/timeago.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/micromodal/0.4.6/micromodal.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/timer.jquery/0.9.0/timer.jquery.min.js
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -44,10 +45,13 @@ $(function() {
             '#alert-btn { width: 100%; height: 8vw; }',
             '.wrap-button > .my-button { position: absolute; top: 1.6vw; left: -5.5vw; }',
 
-            '.alert-counter { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #767676; box-sizing: border-box; margin-bottom: 2vw; font-size: 2.4vw; color: #9e9e9e; position: relative; }',
+            '.alert-counter, .alert-timer { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #767676; box-sizing: border-box; font-size: 2.4vw; }',
+            '.alert-counter { color: #9e9e9e; position: relative; margin-bottom: 1vw; }',
+            '.alert-timer { margin-bottom: 2vw; color: #e0e0e0; }',
             '#message-curr, #message-all { color: white; opacity: 0.8; }',
             '#message-all { font-weight: 600; opacity: 1; }',
             '.alert-counter > .my-button { position: absolute; top: 0.1vw; left: -5.5vw; font-size: 3.7vw; }',
+            '.alert-timer { font-family: Consolas, monospace; }',
 
             '.my-button { font-size: 4.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; transition: opacity 0.2s; }',
             '.my-button:hover { opacity: 0.9; }',
@@ -57,7 +61,7 @@ $(function() {
             '.alert-nav { width: 100%; margin-bottom: 0.5vw; }',
             '.alert-nav > .my-button { width: 50%; }',
 
-            '.time { margin-left: 0.5em; font-size: 80%; opacity: 0.8; }',
+            '.time { margin-left: 0.5em; font-size: 70%; opacity: 0.7; }',
 
             '.modal { display: none; position: fixed; z-index: 10000; }',
             '.modal.is-open { display: block; }',
@@ -83,6 +87,7 @@ $(function() {
         var blockHtml = '<div class="wrap-block">' +
             '<div class="alert-nav"><button id="prev-button" class="my-button">🡄</button><button id="next-button" class="my-button">🡆</button></div>' +
             '<div class="alert-counter"><span id="message-curr">0</span> / <span id="message-all">0</span><button id="erase-button" class="my-button" data-micromodal-trigger="modal-1">⌦</div>' +
+            '<div id="alert-timer" class="alert-timer">00:00</div>' +
             '<div class="wrap-button"><button id="alert-btn">Next</button><button id="toggle-button" class="my-button">👁</button></div>' +
             '</div>';
 
@@ -91,18 +96,21 @@ $(function() {
             '<div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">' +
             '<header class="modal-header"><h2 id="modal-1-title" class="modal-title">Remove saved messages</h2>' +
             '<button class="modal-close" aria-label="Close" data-micromodal-close></button></header>' +
-            '<footer class="modal-footer"><button id="remove-old" class="modal-btn">Except today</button>' +
+            '<footer class="modal-footer"><button id="remove-old" class="modal-btn">All except today</button>' +
             '<button id="remove-all" class="modal-btn btn-primary">All messages</button></footer>' +
             '</div></div></div>';
 
         var $widget = $('#widget');
         $widget.after(blockHtml).before(modalHtml);
         $('#wrap').after('<div id="wrap-copy">');
+
         var $wrapCopy = $('#wrap-copy');
+        var $timer = $('#alert-timer');
+        var $msgAll = $('#message-all');
 
         var updateCount = function() {
             if (database.length > 0) {
-                $('#message-all').text(database.length);
+                $msgAll.text(database.length);
             }
         }
 
@@ -157,6 +165,8 @@ $(function() {
             lastIndex = ind + 1;
             updateCurr();
             GM_setValue('last_index', lastIndex);
+
+            $timer.timer('pause');
         }
 
         $('#alert-btn').click(function() {
@@ -170,6 +180,9 @@ $(function() {
 
                 database[next].s = 1;
                 GM_setValue('database', database);
+
+                $timer.timer('remove');
+                $timer.timer({ format: '%M:%S' });
             }
         });
 
@@ -195,20 +208,27 @@ $(function() {
 
         $('#toggle-button').click(function() {
             $wrapCopy.find('#alert-text-wrap').toggle();
+            $timer.timer('pause');
         });
 
         MicroModal.init();
+
+        var updateValues = function(all) {
+            updateCurr();
+            GM_setValue('last_index', lastIndex);
+
+            $wrapCopy.empty();
+            $msgAll.text(all);
+            $timer.timer('remove');
+            $timer.text('00:00');
+        }
 
         $('#remove-all').click(function() {
             database = [];
             GM_setValue('database', database);
 
             lastIndex = 0;
-            updateCurr();
-            GM_setValue('last_index', lastIndex);
-
-            $wrapCopy.empty();
-            $('#message-all').text(0);
+            updateValues(0);
 
             MicroModal.close('modal-1');
         });
@@ -227,11 +247,7 @@ $(function() {
                     lastIndex = 0;
                 }
 
-                updateCurr();
-                GM_setValue('last_index', lastIndex);
-
-                $wrapCopy.empty();
-                $('#message-all').text(database.length);
+                updateValues(database.length);
             }
 
             MicroModal.close('modal-1');
