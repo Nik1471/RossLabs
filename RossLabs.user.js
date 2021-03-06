@@ -71,8 +71,6 @@ $(function() {
                         GM_setValue('database', database);
 
                         console.log($('#wrap'));
-
-                        //alertAudio.play();
                     }
                 }
             });
@@ -87,7 +85,10 @@ $(function() {
             $wrapCopy.empty();
             var next = _.findIndex(database, ['s', 0]);
             if (next !== -1) {
-                $wrapCopy.append(database[next].m);
+                alertAudio.pause();
+                alertAudio.currentTime = 0;
+                alertAudio.play();
+                $wrapCopy.append(database[next].m).hide().fadeIn();
                 database[next].s = 1;
                 GM_setValue('database', database);
             }
