@@ -45,8 +45,8 @@ $(function() {
             '#alert-btn { width: 100%; height: 8vw; }',
             '.wrap-button > .my-button { position: absolute; top: 1.6vw; left: -5.5vw; }',
 
-            '.alert-counter, .alert-timer { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #767676; box-sizing: border-box; font-size: 2.4vw; }',
-            '.alert-counter { color: #9e9e9e; position: relative; margin-bottom: 1vw; }',
+            '.alert-counter, .alert-timer { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
+            '.alert-counter { color: #bdbdbd; position: relative; margin-bottom: 1vw; }',
             '.alert-timer { margin-bottom: 2vw; color: #e0e0e0; }',
             '#message-curr, #message-all { color: white; opacity: 0.8; }',
             '#message-all { font-weight: 600; opacity: 1; }',
@@ -74,7 +74,9 @@ $(function() {
             '.modal-header .modal-close:hover, .modal-btn:hover { opacity: 0.7; }',
             '.modal-footer { margin-top: 1vw; }',
             '.modal-btn { margin-right: 1vw; padding: 0.5vw 1vw; background-color: rgba(255,0,0,0.1); border: 1px solid #9e9e9e; font-size: 1.3vw; }',
-            '.btn-primary { background-color: rgba(255,0,0,0.3); }'
+            '.btn-primary { background-color: rgba(255,0,0,0.3); }',
+
+            '.new { background-color: rgba(50, 195, 166, 0.45); }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -106,6 +108,7 @@ $(function() {
 
         var $wrapCopy = $('#wrap-copy');
         var $timer = $('#alert-timer');
+        var $counter = $('.alert-counter');
         var $msgAll = $('#message-all');
 
         var updateCount = function() {
@@ -141,6 +144,7 @@ $(function() {
                         });
 
                         updateCount();
+                        $counter.addClass('new');
 
                         GM_setValue('database', database);
                     }
@@ -166,7 +170,11 @@ $(function() {
             updateCurr();
             GM_setValue('last_index', lastIndex);
 
-            $timer.timer('pause');
+            $timer.timer('remove').text('00:00');
+
+            if (lastIndex === database.length) {
+                $counter.removeClass('new');
+            }
         }
 
         $('#alert-btn').click(function() {
@@ -181,8 +189,7 @@ $(function() {
                 database[next].s = 1;
                 GM_setValue('database', database);
 
-                $timer.timer('remove');
-                $timer.timer({ format: '%M:%S' });
+                $timer.timer('remove').timer({ format: '%M:%S' });
             }
         });
 
@@ -208,7 +215,7 @@ $(function() {
 
         $('#toggle-button').click(function() {
             $wrapCopy.find('#alert-text-wrap').toggle();
-            $timer.timer('pause');
+            $timer.timer('remove').text('00:00');
         });
 
         MicroModal.init();
@@ -219,8 +226,7 @@ $(function() {
 
             $wrapCopy.empty();
             $msgAll.text(all);
-            $timer.timer('remove');
-            $timer.text('00:00');
+            $timer.timer('remove').text('00:00');
         }
 
         $('#remove-all').click(function() {
@@ -229,6 +235,7 @@ $(function() {
 
             lastIndex = 0;
             updateValues(0);
+            $counter.removeClass('new');
 
             MicroModal.close('modal-1');
         });
