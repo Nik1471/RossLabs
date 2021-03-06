@@ -61,7 +61,7 @@ $(function() {
 
             '.modal { display: none; position: fixed; z-index: 10000; }',
             '.modal.is-open { display: block; }',
-            '.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; }',
+            '.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; }',
             '.modal-container { background-color: #fff; padding: 1.1vw; max-width: 30vw; max-height: 100vh; border-radius: 1vw; overflow-y: auto; box-sizing: border-box; }',
             '.modal-header { display: flex; justify-content: space-between; align-items: center; }',
             '.modal-title { margin-top: 0; margin-bottom: 0; font-weight: bold; line-height: 1.25; color: #00449e; box-sizing: border-box; font-size: 1.7vw; }',
@@ -69,7 +69,7 @@ $(function() {
             '.modal-header .modal-close::before { content: "✕"; font-weight: bold; }',
             '.modal-header .modal-close:hover, .modal-btn:hover { opacity: 0.7; }',
             '.modal-footer { margin-top: 1vw; }',
-            '.modal-btn { margin-right: 1vw; padding: 0.5vw 1vw; background-color: rgba(255,0,0,0.1); border: 1px solid #767676; }',
+            '.modal-btn { margin-right: 1vw; padding: 0.5vw 1vw; background-color: rgba(255,0,0,0.1); border: 1px solid #9e9e9e; font-size: 1.3vw; }',
             '.btn-primary { background-color: rgba(255,0,0,0.3); }'
         ].join('\n');
         GM_addStyle(cssCode);
@@ -86,7 +86,14 @@ $(function() {
             '<div class="wrap-button"><button id="alert-btn">Next</button><button id="toggle-button" class="my-button">👁</button></div>' +
             '</div>';
 
-        var modalHtml = '<div id="modal-1" class="modal" aria-hidden="true"><div tabindex="-1" class="modal-overlay" data-micromodal-close><div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"><header class="modal-header"><h2 id="modal-1-title" class="modal-title">Remove saved messages</h2><button class="modal-close" aria-label="Close" data-micromodal-close></button></header><footer class="modal-footer"><button class="modal-btn">Except today</button><button class="modal-btn btn-primary">All messages</button></footer></div></div></div>';
+        var modalHtml = '<div id="modal-1" class="modal" aria-hidden="true">' +
+            '<div tabindex="-1" class="modal-overlay" data-micromodal-close>' +
+            '<div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">' +
+            '<header class="modal-header"><h2 id="modal-1-title" class="modal-title">Remove saved messages</h2>' +
+            '<button class="modal-close" aria-label="Close" data-micromodal-close></button></header>' +
+            '<footer class="modal-footer"><button id="remove-old" class="modal-btn">Except today</button>' +
+            '<button id="remove-all" class="modal-btn btn-primary">All messages</button></footer>' +
+            '</div></div></div>';
 
         var $widget = $('#widget');
         $widget.after(blockHtml).before(modalHtml);
@@ -191,5 +198,43 @@ $(function() {
         });
 
         MicroModal.init();
+
+        $('#remove-all').click(function() {
+            database = [];
+            GM_setValue('database', database);
+
+            lastIndex = 0;
+            updateCurr();
+            GM_setValue('last_index', lastIndex);
+
+            $wrapCopy.empty();
+            $('#message-all').text(0);
+
+            MicroModal.close('modal-1');
+        });
+
+        $('#remove-old').click(function() {
+            if (database.length > 0) {
+                var today = new Date().setHours(0, 0, 0, 0);
+                database = _.filter(database, function(o) {
+                    return (o.t >= today) || (o.s === 0)
+                });
+                GM_setValue('database', database);
+
+                if (database.length) {
+                    lastIndex = 1;
+                } else {
+                    lastIndex = 0;
+                }
+
+                updateCurr();
+                GM_setValue('last_index', lastIndex);
+
+                $wrapCopy.empty();
+                $('#message-all').text(database.length);
+            }
+
+            MicroModal.close('modal-1');
+        });
     }
 });
