@@ -116,7 +116,7 @@ $(function() {
 
         var showMessage = function(ind) {
             $wrapCopy.empty();
-            $wrapCopy.append(database[ind].m).hide().fadeIn();
+            $wrapCopy.append(database[ind].m).hide(0).fadeIn('fast');
             lastIndex = ind + 1;
             updateCur();
             GM_setValue('last_index', lastIndex);
@@ -142,6 +142,16 @@ $(function() {
                     showMessage(lastIndex - 1);
                 } else if (lastIndex > 1) {
                     showMessage(lastIndex - 2);
+                }
+            }
+        });
+
+        $('#next-btn').click(function() {
+            if (lastIndex) {
+                if ($wrapCopy.children().length === 0) {
+                    showMessage(lastIndex - 1);
+                } else if (database[lastIndex] && database[lastIndex].s === 1) {
+                    showMessage(lastIndex);
                 }
             }
         });
