@@ -31,12 +31,17 @@ $(function() {
 
         var cssCode = [
             '#wrap { display: none !important; }',
-            '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; }',
-            '#widget { right: 150px !important; }',
-            '#wrap-btn { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 150px; display: flex; align-items: center; justify-content: center; }',
+            '#widget { right: 14vw !important; }',
+            '#alert-text { vertical-align: bottom !important; }',
             '.hidden { opacity: 1 !important; }',
             '.animated { animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
-            '.alert-btn { width: 100px; height: 100px; }'
+
+            '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; }',
+            '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 14vw; padding: 1.3vw; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
+            '#alert-btn { width: 100%; height: 8vw; }',
+            '.alert-cnt { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #767676; box-sizing: border-box; margin-bottom: 2vw; font-size: 2.4vw; color: #9e9e9e }',
+            '#msg-cur, #msg-all { color: white; }',
+            '#msg-all { font-weight: 600; }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -46,10 +51,30 @@ $(function() {
             GM_setValue('database', database);
         }
 
-        var buttonHtml = '<div id="wrap-btn"><button id="alert-btn" class="alert-btn">Next</button></div>';
+        var blockHtml = '<div class="wrap-block">' +
+            '<div class="alert-cnt"><span id="msg-cur">0</span> / <span id="msg-all">0</span></div>' +
+            '<button id="alert-btn">Next</button>' +
+            '</div>';
         var $widget = $('#widget');
-        $widget.after(buttonHtml);
+        $widget.after(blockHtml);
         $('#wrap').after('<div id="wrap-copy">');
+
+        var updateCount = function() {
+            if (database.length > 0) {
+                $('#msg-all').text(database.length);
+            }
+        }
+
+        updateCount();
+
+        var updateCur = function() {
+            $('#msg-cur').text(lastIndex);
+        }
+
+        var lastIndex = GM_getValue('last_index');
+        if (lastIndex) {
+            updateCur();
+        }
 
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
@@ -68,9 +93,9 @@ $(function() {
                             "s": 0
                         });
 
-                        GM_setValue('database', database);
+                        updateCount();
 
-                        console.log($('#wrap'));
+                        GM_setValue('database', database);
                     }
                 }
             });
@@ -82,15 +107,21 @@ $(function() {
 
         $('#alert-btn').click(function() {
             var $wrapCopy = $('#wrap-copy');
-            $wrapCopy.empty();
             var next = _.findIndex(database, ['s', 0]);
             if (next !== -1) {
                 alertAudio.pause();
                 alertAudio.currentTime = 0;
                 alertAudio.play();
+
+                $wrapCopy.empty();
                 $wrapCopy.append(database[next].m).hide().fadeIn();
                 database[next].s = 1;
+
+                lastIndex = next + 1;
+                updateCur();
+
                 GM_setValue('database', database);
+                GM_setValue('last_index', lastIndex);
             }
         });
     }
