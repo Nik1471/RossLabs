@@ -19,7 +19,8 @@
 
 /* global jQuery, $, _, timeago, MicroModal */
 
-var alertUrl = 'https://cdn.twitchalerts.com/twitch-bits/sounds/bits.ogg'
+var alertUrl = 'https://cdn.twitchalerts.com/twitch-bits/sounds/bits.ogg';
+var ratesUrl = 'https://www.floatrates.com/daily/usd.json';
 
 this.$ = jQuery.noConflict(true);
 
@@ -164,6 +165,44 @@ $(function() {
             attributes: true
         });
 
+        var curRates = {};
+        $.getJSON(ratesUrl, function(data) {
+            if (data) {
+                curRates = data;
+            }
+        });
+
+        var dollarCodes = {'a': 'aud', 'ar': 'ars', 'au': 'aud', 'b': 'bnd', 'bd': 'bmd', 'bds': 'bbd', 'bs': 'bsd', 'bz': 'bzd', 'c': 'cad', 'ca': 'cad', 'cl': 'clp', 'col': 'cop', 'cu': 'cup', 'cuc': 'cuc', 'ec': 'xcd', 'fj': 'fjd', 'g': 'gyd', 'gy': 'gyd', 'hk': 'hkd', 'j': 'jmd', 'jm': 'jmd', 'l': 'lrd', 'ld': 'lrd', 'mop': 'mop', 'mx': 'mxn', 'n': 'nad', 'nt': 'twd', 'nz': 'nzd', 'r': 'brl', 'rd': 'dop', 's': 'sgd', 'sg': 'sgd', 'si': 'sbd', 'sr': 'srd', 't': 'top', 'tt': 'ttd', 'ws': 'wst'}
+
+        var getAmountMsg = function(amount) {
+            var sumCode, sumValue, parsed, abbr;
+
+            if ($.isEmptyObject(curRates)) {
+                return false;
+            }
+
+            if (/^\$[\d.]+$/.test(amount)) {
+                return false;
+            }
+
+            if (amount.indexOf('$') !== -1) {
+                parsed = amount.split('$');
+                abbr = parsed[0].toLowerCase();
+                if (dollarCodes.hasOwnProperty(abbr)) {
+                    sumCode = dollarCodes[abbr];
+                    sumValue = parsed[1] * 1;
+                } else {
+                    return false;
+                }
+            } else if (/^[A-Za-z]{3} [\d.]+$/.test(amount)) {
+                parsed = amount.split(' ');
+                sumCode = parsed[0].toLowerCase();
+                sumValue = parsed[1] * 1;
+            }
+
+            return [sumCode, sumValue]
+        }
+
         var showMessage = function(ind, fast) {
             var speed = 400;
             if (fast) {
@@ -171,9 +210,13 @@ $(function() {
             }
             timeago.cancel();
             $wrapCopy.empty();
+
             $wrapCopy.append(database[ind].m).hide(0).fadeIn(speed);
             $wrapCopy.find('#alert-message').append('<time class="time" datetime="' + database[ind].t + '">');
             timeago.render(document.querySelectorAll('.time'));
+
+            var amount = $wrapCopy.find('[data-token="amount"]').text();
+
             lastIndex = ind + 1;
             updateCurr();
             GM_setValue('last_index', lastIndex);
