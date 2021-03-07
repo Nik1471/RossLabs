@@ -21,6 +21,7 @@
 
 var alertUrl = 'https://cdn.twitchalerts.com/twitch-bits/sounds/bits.ogg';
 var ratesUrl = 'https://www.floatrates.com/daily/usd.json';
+var logoUrl = 'https://raw.githubusercontent.com/Nik1471/RossmannLabs/master/rossmann-logo.png';
 
 this.$ = jQuery.noConflict(true);
 
@@ -35,7 +36,7 @@ $(function () {
 
         var cssCode = [
             '#wrap { display: none !important; }',
-            '#widget { right: 14vw !important; animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
+            '#widget { right: 15vw !important; animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
             '#alert-text { vertical-align: bottom !important; }',
             '.hidden { opacity: 1 !important; }',
 
@@ -45,17 +46,16 @@ $(function () {
             '.my-button:focus { outline: 0; }',
 
             '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: flex-end; justify-content: center; }',
-            '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 14vw; padding: 1.3vw; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
-            '.wrap-button { width: 100%; position: relative; }',
-            '#alert-btn { width: 100%; height: 8vw; }',
-            '.wrap-button > .my-button { position: absolute; top: 1.6vw; left: -5.5vw; }',
+            '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 15vw; padding: 0 2vw 2vw 0; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
+            '.wrap-button { width: 100%; position: relative; text-align: center; }',
+            '.wrap-button > .my-button { position: absolute; top: -5.5vw; left: -5.5vw; }',
 
             '.alert-counter, .alert-timer { width: 100%; padding: 0.35vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
             '.alert-counter { color: #bdbdbd; position: relative; margin-bottom: 1vw; }',
             '.alert-counter > .my-button { position: absolute; top: -0.1vw; left: -5.5vw; font-size: 3.7vw; }',
             '.alert-counter.pulse { -webkit-animation: pulse 2s; animation: pulse 2s; }',
 
-            '.alert-timer { margin-bottom: 2vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.7vw; padding: 0.1vw; }',
+            '.alert-timer { margin-bottom: 1.5vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.7vw; padding: 0.1vw; }',
             '#message-curr, #message-all { color: white; opacity: 0.8; }',
             '#message-all { font-weight: 600; opacity: 1; }',
 
@@ -82,7 +82,12 @@ $(function () {
             '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }',
 
             '#converted { text-align: center; opacity: 0.8; font-size: 170% !important; margin-bottom: 0.5vw; }',
-            '.dollars { color: rgb(50, 195, 166); }'
+            '.dollars { color: rgb(50, 195, 166); }',
+
+            '.my-logo { width: 90%; height: auto; }',
+            '.my-logo:hover { cursor: pointer; opacity: 0.9 }',
+            '@keyframes spin { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);  } }',
+            '.spin { animation: spin 0.5s ease-in-out; -webkit-animation: spin 0.5s ease-in-out; }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -96,7 +101,7 @@ $(function () {
             '<div class="alert-nav"><button id="prev-button" class="my-button">🡄</button><button id="next-button" class="my-button">🡆</button></div>' +
             '<div class="alert-counter"><span id="message-curr">0</span> / <span id="message-all">0</span><button id="erase-button" class="my-button" data-micromodal-trigger="modal-1">⌦</button><div class="plus-sign animated">✉</div></div>' +
             '<div id="alert-timer" class="alert-timer">00:00</div>' +
-            '<div class="wrap-button"><button id="alert-btn">Next</button><button id="toggle-button" class="my-button">👁</button></div>' +
+            '<div class="wrap-button"><img id="alert-button" class="my-logo" src="' + logoUrl + '"><button id="toggle-button" class="my-button">👁</button></div>' +
             '</div>';
 
         var modalHtml = '<div id="modal-1" class="modal" aria-hidden="true">' +
@@ -259,12 +264,18 @@ $(function () {
             }
         };
 
-        $('#alert-btn').click(function () {
+        $('#alert-button').click(function () {
             var next = _.findIndex(database, ['s', 0]);
+            var $this = $(this);
             if (next !== -1) {
                 alertAudio.pause();
                 alertAudio.currentTime = 0;
                 alertAudio.play();
+
+                $this.addClass('spin');
+                setTimeout(function () {
+                    $this.removeClass('spin');
+                }, 500);
 
                 showMessage(next);
 
