@@ -191,6 +191,8 @@ $(function () {
                 return false;
             }
 
+            amount = amount.replace(',', '');
+
             if (/^\$[\d.]+$/.test(amount)) {
                 return false;
             }
