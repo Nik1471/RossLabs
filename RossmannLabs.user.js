@@ -34,10 +34,14 @@ $(function() {
 
         var cssCode = [
             '#wrap { display: none !important; }',
-            '#widget { right: 14vw !important; }',
+            '#widget { right: 14vw !important; animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
             '#alert-text { vertical-align: bottom !important; }',
             '.hidden { opacity: 1 !important; }',
-            '.animated { animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
+
+            '.my-button { font-size: 4.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; transition: opacity 0.2s; }',
+            '.my-button:hover { opacity: 0.9; }',
+            '.my-button:active { opacity: 0.6; }',
+            '.my-button:focus { outline: 0; }',
 
             '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: flex-end; justify-content: center; }',
             '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 14vw; padding: 1.3vw; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
@@ -45,20 +49,16 @@ $(function() {
             '#alert-btn { width: 100%; height: 8vw; }',
             '.wrap-button > .my-button { position: absolute; top: 1.6vw; left: -5.5vw; }',
 
-            '.alert-counter, .alert-timer { width: 100%; padding: 0.6vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
+            '.alert-counter, .alert-timer { width: 100%; padding: 0.35vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
             '.alert-counter { color: #bdbdbd; position: relative; margin-bottom: 1vw; }',
-            '.alert-timer { margin-bottom: 2vw; color: #e0e0e0; }',
+            '.alert-counter > .my-button { position: absolute; top: -0.1vw; left: -5.5vw; font-size: 3.7vw; }',
+            '.alert-counter.pulse { -webkit-animation: pulse 2s; animation: pulse 2s; }',
+
+            '.alert-timer { margin-bottom: 2vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.7vw; padding: 0.1vw; }',
             '#message-curr, #message-all { color: white; opacity: 0.8; }',
             '#message-all { font-weight: 600; opacity: 1; }',
-            '.alert-counter > .my-button { position: absolute; top: 0.1vw; left: -5.5vw; font-size: 3.7vw; }',
-            '.alert-timer { font-family: Consolas, monospace; }',
 
-            '.my-button { font-size: 4.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; transition: opacity 0.2s; }',
-            '.my-button:hover { opacity: 0.9; }',
-            '.my-button:active { opacity: 0.6; }',
-            '.my-button:focus { outline: 0; }',
-
-            '.alert-nav { width: 100%; margin-bottom: 0.5vw; }',
+            '.alert-nav { width: 100%; margin-bottom: 0.5vw; z-index: 100; }',
             '.alert-nav > .my-button { width: 50%; }',
 
             '.time { margin-left: 0.5em; font-size: 70%; opacity: 0.7; }',
@@ -76,7 +76,9 @@ $(function() {
             '.modal-btn { margin-right: 1vw; padding: 0.5vw 1vw; background-color: rgba(255,0,0,0.1); border: 1px solid #9e9e9e; font-size: 1.3vw; }',
             '.btn-primary { background-color: rgba(255,0,0,0.3); }',
 
-            '.new { background-color: rgba(50, 195, 166, 0.45); }'
+            '.new { background-color: rgba(50, 195, 166, 0.45); }',
+            '.plus-sign { position: absolute; top: -6vw; left: calc(50% - 4vw); width: 8vw; font-size: 8vw; line-height: 0.7; color: rgb(50, 195, 166); display: none; }',
+            '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -88,7 +90,7 @@ $(function() {
 
         var blockHtml = '<div class="wrap-block">' +
             '<div class="alert-nav"><button id="prev-button" class="my-button">🡄</button><button id="next-button" class="my-button">🡆</button></div>' +
-            '<div class="alert-counter"><span id="message-curr">0</span> / <span id="message-all">0</span><button id="erase-button" class="my-button" data-micromodal-trigger="modal-1">⌦</div>' +
+            '<div class="alert-counter"><span id="message-curr">0</span> / <span id="message-all">0</span><button id="erase-button" class="my-button" data-micromodal-trigger="modal-1">⌦</button><div class="plus-sign animated">✉</div></div>' +
             '<div id="alert-timer" class="alert-timer">00:00</div>' +
             '<div class="wrap-button"><button id="alert-btn">Next</button><button id="toggle-button" class="my-button">👁</button></div>' +
             '</div>';
@@ -110,6 +112,7 @@ $(function() {
         var $timer = $('#alert-timer');
         var $counter = $('.alert-counter');
         var $msgAll = $('#message-all');
+        var $plusSign = $('.plus-sign');
 
         var updateCount = function() {
             if (database.length > 0) {
@@ -144,7 +147,12 @@ $(function() {
                         });
 
                         updateCount();
+
                         $counter.addClass('new');
+                        $plusSign.show().addClass('fadeOutUp');
+                        setTimeout(function() {
+                            $plusSign.removeClass('fadeOutUp').hide();
+                        }, 2000);
 
                         GM_setValue('database', database);
                     }
@@ -157,7 +165,7 @@ $(function() {
         });
 
         var showMessage = function(ind, fast) {
-            var speed = 'fast';
+            var speed = 400;
             if (fast) {
                 speed = 0;
             }
