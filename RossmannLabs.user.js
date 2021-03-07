@@ -79,7 +79,10 @@ $(function () {
 
             '.new { background-color: rgba(50, 195, 166, 0.45); }',
             '.plus-sign { position: absolute; top: -6vw; left: calc(50% - 4vw); width: 8vw; font-size: 8vw; line-height: 0.7; color: rgb(50, 195, 166); display: none; }',
-            '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }'
+            '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }',
+
+            '#converted { text-align: center; opacity: 0.8; font-size: 170% !important; margin-bottom: 0.5vw; }',
+            '.dollars { color: rgb(50, 195, 166); }'
         ].join('\n');
         GM_addStyle(cssCode);
 
@@ -165,19 +168,21 @@ $(function () {
             attributes: true
         });
 
-        var curRates = {};
+        var currRates = {};
         $.getJSON(ratesUrl, function (data) {
             if (data) {
-                curRates = data;
+                currRates = data;
             }
         });
 
         var dollarCodes = {'a': 'aud', 'ar': 'ars', 'au': 'aud', 'b': 'bnd', 'bd': 'bmd', 'bds': 'bbd', 'bs': 'bsd', 'bz': 'bzd', 'c': 'cad', 'ca': 'cad', 'cl': 'clp', 'col': 'cop', 'cu': 'cup', 'cuc': 'cuc', 'ec': 'xcd', 'fj': 'fjd', 'g': 'gyd', 'gy': 'gyd', 'hk': 'hkd', 'j': 'jmd', 'jm': 'jmd', 'l': 'lrd', 'ld': 'lrd', 'mop': 'mop', 'mx': 'mxn', 'n': 'nad', 'nt': 'twd', 'nz': 'nzd', 'r': 'brl', 'rd': 'dop', 's': 'sgd', 'sg': 'sgd', 'si': 'sbd', 'sr': 'srd', 't': 'top', 'tt': 'ttd', 'ws': 'wst'};
 
-        var getAmountMsg = function (amount) {
+        var currSymbols = [['€', 'eur'], ['£', 'gbp'], ['₹', 'inr'], ['₽', 'rub'], ['₩', 'krw'], ['¥', 'jpy'], ['₪', 'ils'], ['kč', 'czk'], ['฿', 'thb'], ['₺', 'try'], ['zł', 'pln'], ['₱', 'php'], ['৳', 'bdt'], ['₡', 'crc'], ['₮', 'mnt'], ['₫', 'vnd'], ['₸', 'kzt'], ['₭', 'lak'], ['₦', 'ngn'], ['֏', 'amd'], ['₲', 'pyg'], ['₴', 'uah'], ['₾', 'gel'], ['лв', 'bgn'], ['₼', 'azn'], ['៛', 'khr']];
+
+        var parseAmount = function (amount) {
             var sumCode, sumValue, parsed, abbr;
 
-            if ($.isEmptyObject(curRates)) {
+            if ($.isEmptyObject(currRates)) {
                 return false;
             }
 
@@ -198,9 +203,28 @@ $(function () {
                 parsed = amount.split(' ');
                 sumCode = parsed[0].toLowerCase();
                 sumValue = parsed[1] * 1;
+            } else {
+                for (var i = 0; i < currSymbols.length; i++) {
+                    var sign = currSymbols[i][0];
+                    if (amount.indexOf(sign) !== -1) {
+                        sumCode = currSymbols[i][1];
+                        sumValue = amount.split(sign)[1] * 1;
+                        break;
+                    }
+                }
             }
 
-            return [sumCode, sumValue]
+            if (sumCode && sumValue) {
+                if (currRates.hasOwnProperty(sumCode)) {
+                    var rate = currRates[sumCode].inverseRate;
+                    var name = currRates[sumCode].name.trim();
+                    var converted = _.round(sumValue * rate, 2);
+
+                    return ['$' + converted, name];
+                }
+            }
+
+            return false;
         };
 
         var showMessage = function (ind, fast) {
@@ -216,6 +240,13 @@ $(function () {
             timeago.render(document.querySelectorAll('.time'));
 
             var amount = $wrapCopy.find('[data-token="amount"]').text();
+            var parsed = parseAmount(amount);
+            if (parsed) {
+                var msgStyle = $wrapCopy.find('#alert-message').attr('style');
+                var amountHtml = '<div id="converted">[ ' + parsed[1] + ', <span class="dollars">' + parsed[0] + '</span> ]</div>';
+                $wrapCopy.find('#alert-message').after(amountHtml);
+                $('#converted').attr('style', msgStyle);
+            }
 
             lastIndex = ind + 1;
             updateCurr();
