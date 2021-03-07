@@ -24,7 +24,7 @@ var ratesUrl = 'https://www.floatrates.com/daily/usd.json';
 
 this.$ = jQuery.noConflict(true);
 
-$(function() {
+$(function () {
     if ($('#shield').length) {
         var cssCodeMain = [
             '#shield, #boombox, #gif, #attachments { display: none !important; }'
@@ -115,25 +115,25 @@ $(function() {
         var $msgAll = $('#message-all');
         var $plusSign = $('.plus-sign');
 
-        var updateCount = function() {
+        var updateCount = function () {
             if (database.length > 0) {
                 $msgAll.text(database.length);
             }
-        }
+        };
 
         updateCount();
 
-        var updateCurr = function() {
+        var updateCurr = function () {
             $('#message-curr').text(lastIndex);
-        }
+        };
 
         var lastIndex = GM_getValue('last_index');
         if (lastIndex) {
             updateCurr();
         }
 
-        var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
                 if (mutation.attributeName === 'class') {
                     var $target = $(mutation.target);
                     var attr = $target.prop(mutation.attributeName);
@@ -142,16 +142,16 @@ $(function() {
                         var time = new Date().getTime();
 
                         database.push({
-                            "t": time,
-                            "m": message,
-                            "s": 0
+                            't': time,
+                            'm': message,
+                            's': 0
                         });
 
                         updateCount();
 
                         $counter.addClass('new');
                         $plusSign.show().addClass('fadeOutUp');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $plusSign.removeClass('fadeOutUp').hide();
                         }, 2000);
 
@@ -166,15 +166,15 @@ $(function() {
         });
 
         var curRates = {};
-        $.getJSON(ratesUrl, function(data) {
+        $.getJSON(ratesUrl, function (data) {
             if (data) {
                 curRates = data;
             }
         });
 
-        var dollarCodes = {'a': 'aud', 'ar': 'ars', 'au': 'aud', 'b': 'bnd', 'bd': 'bmd', 'bds': 'bbd', 'bs': 'bsd', 'bz': 'bzd', 'c': 'cad', 'ca': 'cad', 'cl': 'clp', 'col': 'cop', 'cu': 'cup', 'cuc': 'cuc', 'ec': 'xcd', 'fj': 'fjd', 'g': 'gyd', 'gy': 'gyd', 'hk': 'hkd', 'j': 'jmd', 'jm': 'jmd', 'l': 'lrd', 'ld': 'lrd', 'mop': 'mop', 'mx': 'mxn', 'n': 'nad', 'nt': 'twd', 'nz': 'nzd', 'r': 'brl', 'rd': 'dop', 's': 'sgd', 'sg': 'sgd', 'si': 'sbd', 'sr': 'srd', 't': 'top', 'tt': 'ttd', 'ws': 'wst'}
+        var dollarCodes = {'a': 'aud', 'ar': 'ars', 'au': 'aud', 'b': 'bnd', 'bd': 'bmd', 'bds': 'bbd', 'bs': 'bsd', 'bz': 'bzd', 'c': 'cad', 'ca': 'cad', 'cl': 'clp', 'col': 'cop', 'cu': 'cup', 'cuc': 'cuc', 'ec': 'xcd', 'fj': 'fjd', 'g': 'gyd', 'gy': 'gyd', 'hk': 'hkd', 'j': 'jmd', 'jm': 'jmd', 'l': 'lrd', 'ld': 'lrd', 'mop': 'mop', 'mx': 'mxn', 'n': 'nad', 'nt': 'twd', 'nz': 'nzd', 'r': 'brl', 'rd': 'dop', 's': 'sgd', 'sg': 'sgd', 'si': 'sbd', 'sr': 'srd', 't': 'top', 'tt': 'ttd', 'ws': 'wst'};
 
-        var getAmountMsg = function(amount) {
+        var getAmountMsg = function (amount) {
             var sumCode, sumValue, parsed, abbr;
 
             if ($.isEmptyObject(curRates)) {
@@ -201,9 +201,9 @@ $(function() {
             }
 
             return [sumCode, sumValue]
-        }
+        };
 
-        var showMessage = function(ind, fast) {
+        var showMessage = function (ind, fast) {
             var speed = 400;
             if (fast) {
                 speed = 0;
@@ -226,9 +226,9 @@ $(function() {
             if (lastIndex === database.length) {
                 $counter.removeClass('new');
             }
-        }
+        };
 
-        $('#alert-btn').click(function() {
+        $('#alert-btn').click(function () {
             var next = _.findIndex(database, ['s', 0]);
             if (next !== -1) {
                 alertAudio.pause();
@@ -240,11 +240,11 @@ $(function() {
                 database[next].s = 1;
                 GM_setValue('database', database);
 
-                $timer.timer('remove').timer({ format: '%M:%S' });
+                $timer.timer('remove').timer({format: '%M:%S'});
             }
         });
 
-        $('#prev-button').click(function() {
+        $('#prev-button').click(function () {
             if (lastIndex) {
                 if ($wrapCopy.children().length === 0) {
                     showMessage(lastIndex - 1, true);
@@ -254,7 +254,7 @@ $(function() {
             }
         });
 
-        $('#next-button').click(function() {
+        $('#next-button').click(function () {
             if (lastIndex) {
                 if ($wrapCopy.children().length === 0) {
                     showMessage(lastIndex - 1, true);
@@ -264,23 +264,23 @@ $(function() {
             }
         });
 
-        $('#toggle-button').click(function() {
+        $('#toggle-button').click(function () {
             $wrapCopy.find('#alert-text-wrap').toggle();
             $timer.timer('remove').text('00:00');
         });
 
         MicroModal.init();
 
-        var updateValues = function(all) {
+        var updateValues = function (all) {
             updateCurr();
             GM_setValue('last_index', lastIndex);
 
             $wrapCopy.empty();
             $msgAll.text(all);
             $timer.timer('remove').text('00:00');
-        }
+        };
 
-        $('#remove-all').click(function() {
+        $('#remove-all').click(function () {
             database = [];
             GM_setValue('database', database);
 
@@ -291,10 +291,10 @@ $(function() {
             MicroModal.close('modal-1');
         });
 
-        $('#remove-old').click(function() {
+        $('#remove-old').click(function () {
             if (database.length > 0) {
                 var today = new Date().setHours(0, 0, 0, 0);
-                database = _.filter(database, function(o) {
+                database = _.filter(database, function (o) {
                     return (o.t >= today) || (o.s === 0)
                 });
                 GM_setValue('database', database);
