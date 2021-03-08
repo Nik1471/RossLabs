@@ -67,19 +67,19 @@ $(function () {
             '@keyframes spin { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);  } }',
             '.spin { animation: spin 0.5s ease-in-out; -webkit-animation: spin 0.5s ease-in-out; }',
             // Message counter block and Remove messages button
-            '.alert-counter, .alert-timer { width: 100%; padding: 0.35vw; text-align: center; background-color: rgb(239 239 239 / 20%); border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
+            '.alert-counter, .alert-timer { width: 100%; padding: 0.35vw; text-align: center; background-color: #6b5f58; border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
             '.alert-counter { color: #bdbdbd; position: relative; margin-bottom: 1vw; }',
             '.alert-counter > .my-button { position: absolute; top: -0.1vw; left: -5.5vw; font-size: 3.7vw; }',
-            '#message-curr, #message-all { color: white; opacity: 0.8; }',
-            '#message-all { font-weight: 600; opacity: 1; }',
-            '.new { background-color: rgba(50, 195, 166, 0.45); }',
+            '#message-curr, #message-all { color: #dedbda; }',
+            '#message-all { font-weight: 600; color: white; }',
+            '.new { background-color: #3e7867; }',
             // Alert timer styles
             '.alert-timer { margin-bottom: 1.5vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.7vw; padding: 0.1vw; }',
             // Previous and next message buttons
             '.alert-nav { width: 100%; margin-bottom: 0.5vw; z-index: 100; }',
             '.alert-nav > .my-button { width: 50%; }',
             // Time ago line in message block
-            '.time { margin-left: 0.5em; font-size: 70%; opacity: 0.7; }',
+            '.time { margin-left: 0.5em; font-size: 70%; color: #bfbab8; }',
             // Modal styles for Remove messages button
             '.modal { display: none; position: fixed; z-index: 10000; }',
             '.modal.is-open { display: block; }',
@@ -97,8 +97,8 @@ $(function () {
             '.plus-sign { position: absolute; top: -6vw; left: calc(50% - 4vw); width: 8vw; font-size: 8vw; line-height: 0.7; color: rgb(50, 195, 166); display: none; }',
             '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }',
             // Converted currency styles
-            '#converted { text-align: center; opacity: 0.8; font-size: 170% !important; margin-bottom: 0.5vw; }',
-            '.dollars { color: rgb(50, 195, 166); }'
+            '#converted { text-align: center; color: #c5c2c0 !important; font-size: 170% !important; margin-bottom: 0.5vw; }',
+            '.dollars { color: #36a78f; }'
         ].join('\n');
         GM_addStyle(cssCode);
 
