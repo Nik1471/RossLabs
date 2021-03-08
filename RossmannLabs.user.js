@@ -34,10 +34,7 @@ $(function () {
         /**
          *  Parent page: hide divs that block clicks
          */
-        var cssCodeMain = [
-            '#shield, #boombox, #gif, #attachments { display: none !important; }'
-        ].join('\n');
-        GM_addStyle(cssCodeMain);
+        GM_addStyle('#shield, #boombox, #gif, #attachments { display: none !important; }');
     } else {
         /**
          *  Iframe page: main action
