@@ -48,38 +48,38 @@ $(function () {
         var cssCode = [
             // Rewrite some default styles
             '#wrap { display: none !important; }',
-            '#widget { right: 15vw !important; animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
+            '#widget { right: 11vw !important; animation-duration: 0s !important; -webkit-animation-duration: 0s !important; }',
             '#alert-text { vertical-align: bottom !important; }',
             '.hidden { opacity: 1 !important; }',
             // Icon button styles
-            '.my-button { font-size: 4.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; transition: opacity 0.2s; }',
+            '.my-button { font-size: 3.5vw; line-height: 1; color: white; background-color: transparent; border: 0; padding: 0; opacity: 0; z-index: 10; transition: opacity 0.2s; }',
             '.my-button:hover { opacity: 0.9; }',
             '.my-button:active { opacity: 0.6; }',
             '.my-button:focus { outline: 0; }',
             // Wrap block styles
             '#wrap-copy { position: relative; height: 100%; width: 100%; display: flex; align-items: flex-end; justify-content: center; }',
-            '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 15vw; padding: 0 2vw 2vw 0; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
+            '.wrap-block { position: fixed; top: 0; bottom: 0; right: 0; z-index: 9999; width: 11vw; padding: 0 1.5vw 1.5vw 0; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; flex-direction: column; }',
             // Main (logo) button and Hide message button
             '.wrap-button { width: 100%; position: relative; text-align: center; }',
-            '.wrap-button > .my-button { position: absolute; top: -5.5vw; left: -5.5vw; }',
+            '.wrap-button > .my-button { position: absolute; top: -4.2vw; left: -4.2vw; }',
             '.my-logo { width: 90%; height: auto; }',
             '.my-logo:hover { cursor: pointer; opacity: 0.9 }',
             '@keyframes spin { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);  } }',
             '.spin { animation: spin 0.5s ease-in-out; -webkit-animation: spin 0.5s ease-in-out; }',
             // Message counter block and Remove messages button
-            '.alert-counter, .alert-timer { width: 100%; padding: 0.35vw; text-align: center; background-color: #6b5f58; border: 1px solid #424242; box-sizing: border-box; font-size: 2.4vw; }',
+            '.alert-counter, .alert-timer { width: 100%; padding: 0.2vw; text-align: center; background-color: #6b5f58; border: 1px solid #424242; box-sizing: border-box; font-size: 2vw; line-height: 1; }',
             '.alert-counter { color: #bdbdbd; position: relative; margin-bottom: 1vw; }',
-            '.alert-counter > .my-button { position: absolute; top: -0.1vw; left: -5.5vw; font-size: 3.7vw; }',
+            '.alert-counter > .my-button { position: absolute; top: -0.2vw; left: -4.2vw; font-size: 2.8vw; }',
             '#message-curr, #message-all { color: #dedbda; }',
             '#message-all { font-weight: 600; color: white; }',
             '.new { background-color: #3e7867; }',
             // Alert timer styles
-            '.alert-timer { margin-bottom: 1.5vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.7vw; padding: 0.1vw; }',
+            '.alert-timer { margin-bottom: 1.2vw; color: #e0e0e0; font-family: Consolas, monospace; font-size: 2.3vw; padding: 0.1vw; }',
             // Previous and next message buttons
             '.alert-nav { width: 100%; margin-bottom: 0.5vw; z-index: 100; }',
             '.alert-nav > .my-button { width: 50%; }',
             // Time ago line in message block
-            '.time { margin-left: 0.5em; font-size: 70%; color: #bfbab8; }',
+            '.time { margin-left: 0.5em; font-size: 1.8vw; color: #e0e0e0; }',
             // Modal styles for Remove messages button
             '.modal { display: none; position: fixed; z-index: 10000; }',
             '.modal.is-open { display: block; }',
@@ -94,11 +94,11 @@ $(function () {
             '.modal-btn { margin-right: 1vw; padding: 0.5vw 1vw; background-color: rgba(255,0,0,0.1); border: 1px solid #9e9e9e; font-size: 1.3vw; }',
             '.btn-primary { background-color: rgba(255,0,0,0.3); }',
             // Envelope icon styles and animation
-            '.plus-sign { position: absolute; top: -6vw; left: calc(50% - 4vw); width: 8vw; font-size: 8vw; line-height: 0.7; color: rgb(50, 195, 166); display: none; }',
+            '.plus-sign { position: absolute; top: -3.5vw; left: calc(50% - 3vw); width: 6vw; font-size: 6vw; line-height: 0.7; color: rgb(50, 195, 166); display: none; }',
             '.plus-sign.animated { animation-duration: 2s; -webkit-animation-duration: 2s; }',
             // Converted currency styles
-            '#converted { text-align: center; color: #c5c2c0 !important; font-size: 170% !important; margin-bottom: 0.5vw; }',
-            '.dollars { color: #36a78f; }'
+            '#converted { text-align: center; color: #e0e0e0 !important; font-size: 1.8vw !important; }',
+            '.dollars { color: rgb(50, 195, 166); }'
         ].join('\n');
         GM_addStyle(cssCode);
 
